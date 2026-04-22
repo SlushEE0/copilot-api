@@ -32,7 +32,9 @@ export const createResponses = async (payload: ResponsesPayload) => {
   })
 
   if (!response.ok) {
-    consola.error("Failed to create response", response)
+    consola.error(
+      `Failed to create response: HTTP ${response.status} ${response.statusText} from ${response.url}`,
+    )
     throw new HTTPError("Failed to create response", response)
   }
 

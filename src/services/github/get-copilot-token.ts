@@ -1,3 +1,5 @@
+import consola from "consola"
+
 import { GITHUB_API_BASE_URL, githubHeaders } from "~/lib/api-config"
 import { HTTPError } from "~/lib/error"
 import { state } from "~/lib/state"
@@ -10,7 +12,12 @@ export const getCopilotToken = async () => {
     },
   )
 
-  if (!response.ok) throw new HTTPError("Failed to get Copilot token", response)
+  if (!response.ok) {
+    consola.error(
+      `Failed to get Copilot token: HTTP ${response.status} ${response.statusText} from ${response.url}`,
+    )
+    throw new HTTPError("Failed to get Copilot token", response)
+  }
 
   return (await response.json()) as GetCopilotTokenResponse
 }

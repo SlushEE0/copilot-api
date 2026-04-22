@@ -1,4 +1,5 @@
 import { Hono } from "hono"
+import consola from "consola"
 
 import { forwardError } from "~/lib/error"
 import {
@@ -10,8 +11,9 @@ export const embeddingRoutes = new Hono()
 
 embeddingRoutes.post("/", async (c) => {
   try {
-    const paylod = await c.req.json<EmbeddingRequest>()
-    const response = await createEmbeddings(paylod)
+    const payload = await c.req.json<EmbeddingRequest>()
+    consola.debug("Embeddings request payload:", JSON.stringify(payload))
+    const response = await createEmbeddings(payload)
 
     return c.json(response)
   } catch (error) {
