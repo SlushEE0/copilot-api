@@ -13,8 +13,6 @@ export class HTTPError extends Error {
 }
 
 export async function forwardError(c: Context, error: unknown) {
-  consola.error("Error occurred:", error)
-
   if (error instanceof HTTPError) {
     const errorText = await error.response.text()
     let errorJson: unknown
@@ -23,7 +21,10 @@ export async function forwardError(c: Context, error: unknown) {
     } catch {
       errorJson = errorText
     }
-    consola.error("HTTP error:", errorJson)
+    consola.error(
+      `HTTP ${error.response.status} error from ${error.response.url}:`,
+      errorJson,
+    )
     return c.json(
       {
         error: {
@@ -35,10 +36,12 @@ export async function forwardError(c: Context, error: unknown) {
     )
   }
 
+  const err = error instanceof Error ? error : new Error(String(error))
+  consola.error(`Unhandled error in request: ${err.message}`, err.stack ?? err)
   return c.json(
     {
       error: {
-        message: (error as Error).message,
+        message: err.message,
         type: "error",
       },
     },

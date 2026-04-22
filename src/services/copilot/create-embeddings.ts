@@ -1,3 +1,5 @@
+import consola from "consola"
+
 import { copilotHeaders, copilotBaseUrl } from "~/lib/api-config"
 import { HTTPError } from "~/lib/error"
 import { state } from "~/lib/state"
@@ -11,7 +13,12 @@ export const createEmbeddings = async (payload: EmbeddingRequest) => {
     body: JSON.stringify(payload),
   })
 
-  if (!response.ok) throw new HTTPError("Failed to create embeddings", response)
+  if (!response.ok) {
+    consola.error(
+      `Failed to create embeddings: HTTP ${response.status} ${response.statusText} from ${response.url}`,
+    )
+    throw new HTTPError("Failed to create embeddings", response)
+  }
 
   return (await response.json()) as EmbeddingResponse
 }
