@@ -35,7 +35,7 @@ export async function runServer(options: RunServerOptions): Promise<void> {
   consola.setReporters([
     {
       log(logObj: LogObject) {
-        const args = logObj.args as unknown[]
+        const args = logObj.args
         if (logObj.level <= 0) {
           console.error(...args)
         } else if (logObj.level === 1) {

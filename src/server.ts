@@ -13,8 +13,7 @@ import { usageRoute } from "./routes/usage/route"
 export const server = new Hono()
 
 server.use(async (c, next) => {
-  const { method } = c.req
-  const { path } = c.req
+  const { method, path } = c.req
 
   const isHealthCheck = method === "GET" && path === "/"
   const log = isHealthCheck ? consola.debug : consola.info
