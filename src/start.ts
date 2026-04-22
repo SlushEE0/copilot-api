@@ -3,6 +3,7 @@
 import { defineCommand } from "citty"
 import clipboard from "clipboardy"
 import consola from "consola"
+import type { LogObject } from "consola"
 import { serve, type ServerHandler } from "srvx"
 import invariant from "tiny-invariant"
 
@@ -28,6 +29,24 @@ interface RunServerOptions {
 }
 
 export async function runServer(options: RunServerOptions): Promise<void> {
+  // Consola's default reporter uses process.stdout.write which Bun buffers in
+  // non-TTY (Docker) environments. Route through console.log/warn/error which
+  // Bun always flushes synchronously regardless of TTY.
+  consola.setReporters([
+    {
+      log(logObj: LogObject) {
+        const args = logObj.args
+        if (logObj.level <= 0) {
+          console.error(...args)
+        } else if (logObj.level === 1) {
+          console.warn(...args)
+        } else {
+          console.log(...args)
+        }
+      },
+    },
+  ])
+
   if (options.proxyEnv) {
     initProxyFromEnv()
   }
