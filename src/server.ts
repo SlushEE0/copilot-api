@@ -1,6 +1,6 @@
+import consola from "consola"
 import { Hono } from "hono"
 import { cors } from "hono/cors"
-import { logger } from "hono/logger"
 
 import { completionRoutes } from "./routes/chat-completions/route"
 import { embeddingRoutes } from "./routes/embeddings/route"
@@ -12,7 +12,17 @@ import { usageRoute } from "./routes/usage/route"
 
 export const server = new Hono()
 
-server.use(logger())
+server.use(async (c, next) => {
+  const isHealthCheck = c.req.method === "GET" && c.req.path === "/"
+  const log = isHealthCheck ? consola.debug.bind(consola) : consola.info.bind(consola)
+
+  log(`<-- ${c.req.method} ${c.req.path}`)
+  const start = Date.now()
+
+  await next()
+
+  log(`--> ${c.req.method} ${c.req.path} ${c.res.status} ${Date.now() - start}ms`)
+})
 server.use(cors())
 
 server.get("/", (c) => c.text("Server running"))
