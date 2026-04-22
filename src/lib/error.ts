@@ -37,7 +37,7 @@ export async function forwardError(c: Context, error: unknown) {
   }
 
   const err = error instanceof Error ? error : new Error(String(error))
-  consola.error(`Unexpected error: ${err.message}`, err.stack ?? err)
+  consola.error(`Unhandled error in request: ${err.message}`, err.stack ?? err)
   return c.json(
     {
       error: {
