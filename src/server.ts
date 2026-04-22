@@ -13,15 +13,18 @@ import { usageRoute } from "./routes/usage/route"
 export const server = new Hono()
 
 server.use(async (c, next) => {
-  const isHealthCheck = c.req.method === "GET" && c.req.path === "/"
-  const log = isHealthCheck ? consola.debug.bind(consola) : consola.info.bind(consola)
+  const { method } = c.req
+  const { path } = c.req
 
-  log(`<-- ${c.req.method} ${c.req.path}`)
+  const isHealthCheck = method === "GET" && path === "/"
+  const log = isHealthCheck ? consola.debug : consola.info
+
+  log(`<-- ${method} ${path}`)
   const start = Date.now()
 
   await next()
 
-  log(`--> ${c.req.method} ${c.req.path} ${c.res.status} ${Date.now() - start}ms`)
+  log(`--> ${method} ${path} ${c.res.status} ${Date.now() - start}ms`)
 })
 server.use(cors())
 
